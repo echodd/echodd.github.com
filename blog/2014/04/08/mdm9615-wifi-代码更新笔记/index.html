@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>MDM9615 Wifi 代码更新笔记 - org-page</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="xiandong.zhang " />
+    <link rel="stylesheet" href="/media/css/main.css" type="text/css">
+    <link rel="stylesheet" href="/media/css/prettify.css" type="text/css">
+  </head>
+  <body class="container">
+    <div>
+      <header class="masthead">
+        <h1 class="masthead-title"><a href="/">org-page</a></h1>
+        <p>static site generator</p>
+        <ul>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/media/">Media</a></li>
+          <li><a href="/wiki/">Wiki</a></li>
+          <li><a href="/tags/">Tags</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="https://github.com/kelvinh/org-page">GitHub</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+        <form method="get" id="searchform" action="http://www.google.com/search">
+          <input type="text" class="field" name="q" id="s" placeholder="Search">
+          <input type="hidden" name="q" value="site:echodd.github.com">
+        </form>
+      </header>
+    </div>
+
+<div>
+<div class="post">
+<h1>MDM9615 Wifi 代码更新笔记</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 添加新的package到要编译镜像中</a></li>
+<li><a href="#sec-2">2. 添加编译package .bb文件</a></li>
+<li><a href="#sec-3">3. 添加package 处理的数据源文件</a></li>
+<li><a href="#sec-4">4. 添加打包镜像时处理命令</a></li>
+</ul>
+</div>
+</div>
+<p>
+9615-wifi 代码更新主要是为了在编译出来的代码中直接就支持
+wifi-hostapd功能,更新主要分为以下几个方面:
+</p>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 添加新的package到要编译镜像中</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+在 xxxx/apps_proc/oe-core/meta-msm/recipes/images/9615-cdp-image.inc中添加新的安装包：
+IMAGE_INSTALL += &ldquo;wifi-host&rdquo;
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 添加编译package .bb文件</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+创建目录：xxxx/apps_proc/oe-core/meta-msm/recipes/wifi-host
+在新创建目录下添加wifi-hot.bb文件,新文件内容如下
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">inherit autotools 
+DESCRIPTION = "9615 wifi"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+PR = "r0"
+
+SRC_URI = "file://${WORKSPACE}/external/9615-wifi/"
+
+do_install() {
+	 rm -rf  ${D}${sysconfdir}
+	 mkdir -p ${D}${sysconfdir}/init.d/  
+	 cp -rf ${WORKSPACE}/external/9615-wifi ${D}${sysconfdir}/init.d/
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 添加package 处理的数据源文件</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+数据文件主要包含:wifi驱动和固件/hostapd配置文件/dnsmasq配置文件/wifi自启动脚本
+创建 xxx/apps_proc/external/9615-wifi目录,将要用到的文件拷贝新建目录下
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 添加打包镜像时处理命令</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+在xxx/apps_proc/oe-core/meta-qcom/recipes/images/9615-cdp-usr-image.inc:中包含mkyafffs2image 行之前添加以下内容
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">IMAGE_PREPROCESS_COMMAND += "chmod a+x -R ${IMAGE_ROOTFS}/etc/init.d/9615-wifi;"
+IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/etc/init.d/9615-wifi/dnsmasq.conf ${IMAGE_ROOTFS}/etc;"
+IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/etc/init.d/9615-wifi/wpa-tkip.conf ${IMAGE_ROOTFS}/etc;"
+IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/etc/init.d/9615-wifi/ath6k ${IMAGE_ROOTFS}/home;"
+IMAGE_PREPROCESS_COMMAND += "cd ${IMAGE_ROOTFS}/etc/rc5.d; ln -s /etc/init.d/9615-wifi/start.sh S98start_wifi_hostap ;"
+</pre>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+    <div>
+      <div class="post-meta">
+        <span title="post date" class="post-info">2014-04-08</span>
+        <span title="last modification date" class="post-info">2014-04-08</span>
+        <span title="tags" class="post-info">N/A</span>
+        <span title="author" class="post-info">xiandong.zhang </span>
+      </div>
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+          //var disqus_developer = 1;
+          var disqus_identifier = "/blog/2014/04/08/mdm9615-wifi-代码更新笔记/";
+          var disqus_url = "http://echodd.github.com/blog/2014/04/08/mdm9615-wifi-代码更新笔记/";
+          var disqus_shortname = 'zxd home';
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+      </section>
+      <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+      <script src="https://google-code-prettify.googlecode.com/svn/loader/prettify.js"></script>
+      <script src="/media/js/main.js"></script>
+      <div class="footer">
+        <p>Generated by <a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.x (<a href="http://orgmode.org">Org mode</a> N/A)</p>
+        <p>
+          Copyright &copy; 2012 - 2014 <a href="mailto:zhangxd1224 &lt;at&gt; thundersoft &lt;dot&gt; com">xiandong.zhang </a>
+          &nbsp;&nbsp;-&nbsp;&nbsp;
+          Powered by <a href="https://github.com/kelvinh/org-page" target="_blank">org-page</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

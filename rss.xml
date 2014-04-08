@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>org-page</title>
+    <link>http://echodd.github.com/</link>
+    <description>static site generator</description>
+    <pubDate>Tue, 08 Apr 2014 22:14:01 CST</pubDate>
+    <lastBuildDate>Tue, 08 Apr 2014 22:14:01 CST</lastBuildDate>
+    <docs>http://www.rssboard.org/rss-specification</docs>
+    <generator>Org-page static site generator (https://github.com/kelvinh/org-page)</generator>
+    <item>
+      <title>MDM9615 Wifi 代码更新笔记</title>
+      <link>http://echodd.github.com/blog/2014/04/08/mdm9615-wifi-代码更新笔记/</link>
+      <description>No Description</description>
+      <pubDate>2014-04-08</pubDate>
+      <guid>http://echodd.github.com/blog/2014/04/08/mdm9615-wifi-代码更新笔记/</guid>
+    </item>
+    <item>
+      <title>git 笔记</title>
+      <link>http://echodd.github.com/blog/2014/04/08/git-笔记/</link>
+      <description>No Description</description>
+      <pubDate>2014-04-08</pubDate>
+      <guid>http://echodd.github.com/blog/2014/04/08/git-笔记/</guid>
+    </item>
+  </channel>
+</rss>
